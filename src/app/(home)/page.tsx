@@ -1,5 +1,6 @@
 "use client";
 import { Header } from "@/components/Header";
+import { Order, Service } from "@/types/order";
 import { services } from "@/utils/services";
 import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import {
@@ -52,8 +53,8 @@ export default function Home() {
   const [eventDate, setEventDate] = useState("");
   const [comment, setComment] = useState("");
 
-  const [selectedServices, setSelectedServices] = useState([]);
-  const [servicesState, setServices] = useState(services);
+  const [selectedServices, setSelectedServices] = useState<boolean[]>([]);
+  const [servicesState, setServices] = useState<Service[]>(services);
   const [serviceIndex, setServiceIndex] = useState(0);
 
   const handleName = (e: ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +83,7 @@ export default function Home() {
 
   const handleSelectService = (index: number) => {
     setSelectedServices((prev) => {
-      let newState = [...prev];
+      let newState: boolean[] = [...prev];
       newState[index] = !newState[index];
       return newState;
     });
@@ -132,7 +133,7 @@ export default function Home() {
       },
     });
 
-    const order = {
+    const order: Order = {
       name,
       address,
       eventDate,

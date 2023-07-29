@@ -1,5 +1,7 @@
 "use client";
+
 import { Header } from "@/components/Header";
+import { Order } from "@/types/order";
 import {
   Box,
   Button,
@@ -14,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Home({ params }: { params: { id: string } }) {
-  const [order, setOrder] = useState(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -23,6 +25,7 @@ export default function Home({ params }: { params: { id: string } }) {
       .then((data) => {
         if (data) {
           setOrder(data);
+          console.log(process.env.DATABASE_URL);
         }
       })
       .catch((error) => {
