@@ -35,7 +35,7 @@ export default function Home({ params }: { params: { id: string } }) {
 
   const handleShare = () => {
     let baselink = "https://api.whatsapp.com/send?phone=5527997531022&text=";
-    baselink += `Olá, Darlene!\nFiz o meu pedido em https://localhost:3000/${params.id} e gostaria que fizesse o orçamento! Obrigado(a)!`;
+    baselink += `Olá, Darlene!\nFiz o meu pedido em https://dmb-luizfelmach.vercel.app/${params.id} e gostaria que fizesse o orçamento! Obrigado(a)!`;
     router.push(baselink);
   };
 
