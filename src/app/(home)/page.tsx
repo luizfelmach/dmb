@@ -1,4 +1,5 @@
 "use client";
+import { CheckButton } from "@/components/CheckButton";
 import { Header } from "@/components/Header";
 import { Order, Service } from "@/types/order";
 import { services } from "@/utils/services";
@@ -236,37 +237,16 @@ export default function Home() {
           {services.map((service, index) => {
             return (
               <Box display={"flex"} alignItems={"center"} key={index}>
-                <ListItem
-                  border={"1px"}
-                  borderColor={
-                    !selectedServices[index] ? "whiteAlpha.200" : "purple.100"
-                  }
-                  bgColor={
-                    !selectedServices[index]
-                      ? "whiteAlpha.200"
-                      : "whiteAlpha.300"
-                  }
+                <CheckButton
+                  checked={selectedServices[index]}
                   display={"flex"}
-                  padding={"10px"}
-                  borderRadius={"lg"}
-                  height={"10"}
                   justifyContent={"center"}
                   alignItems={"center"}
                   flexGrow={1}
-                  _hover={{
-                    bgColor: "whiteAlpha.100",
-                    cursor: "pointer",
-                  }}
                   onClick={() => handleSelectService(index)}
                 >
-                  <Box
-                    display={"flex"}
-                    justifyContent={"space-evenly"}
-                    alignContent={"center"}
-                  >
-                    <Text fontSize={"medium"}>{service.name}</Text>
-                  </Box>
-                </ListItem>
+                  <Text fontSize={"medium"}>{service.name}</Text>
+                </CheckButton>
                 <IconButton
                   key={index + 100}
                   ml={2}
