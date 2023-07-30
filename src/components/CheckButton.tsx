@@ -12,7 +12,6 @@ export function CheckButton(props: any) {
       bgColor={!checked ? "whiteAlpha.200" : "whiteAlpha.300"}
       padding={"10px"}
       borderRadius={"lg"}
-      height={"10"}
       flexGrow={1}
       _hover={
         !checked
