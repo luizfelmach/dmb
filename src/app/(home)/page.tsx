@@ -50,7 +50,9 @@ export default function Home() {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [peoples, setPeoples] = useState(0);
-  const [eventDate, setEventDate] = useState("");
+  const [eventDate, setEventDate] = useState(
+    new Date().toISOString().substring(0, 10)
+  );
   const [comment, setComment] = useState("");
 
   const [selectedServices, setSelectedServices] = useState<boolean[]>([]);
