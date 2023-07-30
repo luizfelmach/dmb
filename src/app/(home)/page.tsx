@@ -241,7 +241,11 @@ export default function Home() {
                   borderColor={
                     !selectedServices[index] ? "whiteAlpha.200" : "purple.100"
                   }
-                  bgColor={"whiteAlpha.200"}
+                  bgColor={
+                    !selectedServices[index]
+                      ? "whiteAlpha.200"
+                      : "whiteAlpha.300"
+                  }
                   display={"flex"}
                   padding={"10px"}
                   borderRadius={"lg"}
