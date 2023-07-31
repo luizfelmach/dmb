@@ -60,6 +60,12 @@ export default function Home() {
   const [servicesState, setServices] = useState<Service[]>(services);
   const [serviceIndex, setServiceIndex] = useState(0);
 
+  let initialItemState = Array(services.length);
+  for (var i = 0; i < initialItemState.length; i++)
+    initialItemState[i] = Array(0);
+
+  const [selectedItems, setSelectedItems] = useState(initialItemState);
+
   const handleName = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.value !== "") setNameError.off();
     setName(e.target.value);
@@ -92,6 +98,14 @@ export default function Home() {
     setSelectedServices((prev) => {
       let newState: boolean[] = [...prev];
       newState[index] = !newState[index];
+      return newState;
+    });
+  };
+
+  const handleSelectItem = (indexItem: number) => {
+    setSelectedItems((prev) => {
+      let newState: boolean[][] = [...prev];
+      newState[serviceIndex][indexItem] = !newState[serviceIndex][indexItem];
       return newState;
     });
   };
@@ -150,7 +164,20 @@ export default function Home() {
     };
 
     selectedServices.forEach((flag, index) => {
-      if (flag) order.services.push({ ...servicesState[index] });
+      if (flag) {
+        let service: Service = {
+          name: services[index].name,
+          items: [],
+        };
+
+        for (let i = 0; i < selectedItems[index].length; i++) {
+          if (selectedItems[index][i]) {
+            service.items.push(servicesState[index].items[i]);
+          }
+        }
+
+        order.services.push(service);
+      }
     });
 
     fetch("/api/order", {
@@ -299,10 +326,12 @@ export default function Home() {
               {services[serviceIndex].items.map((item, index) => {
                 return (
                   <CheckButton
+                    checked={selectedItems[serviceIndex][index]}
                     display="flex"
                     justifyContent="center"
                     alignItems="center"
                     key={index}
+                    onClick={() => handleSelectItem(index)}
                   >
                     {item}
                   </CheckButton>
