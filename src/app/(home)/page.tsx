@@ -1,4 +1,5 @@
 "use client";
+import { CheckButton } from "@/components/CheckButton";
 import { Header } from "@/components/Header";
 import { Order, Service } from "@/types/order";
 import { services } from "@/utils/services";
@@ -59,6 +60,12 @@ export default function Home() {
   const [servicesState, setServices] = useState<Service[]>(services);
   const [serviceIndex, setServiceIndex] = useState(0);
 
+  let initialItemState = Array(services.length);
+  for (var i = 0; i < initialItemState.length; i++)
+    initialItemState[i] = Array(0);
+
+  const [selectedItems, setSelectedItems] = useState(initialItemState);
+
   const handleName = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.value !== "") setNameError.off();
     setName(e.target.value);
@@ -84,9 +91,21 @@ export default function Home() {
   };
 
   const handleSelectService = (index: number) => {
+    if (!selectedServices[index]) {
+      setServiceIndex(index);
+      onOpenView();
+    }
     setSelectedServices((prev) => {
       let newState: boolean[] = [...prev];
       newState[index] = !newState[index];
+      return newState;
+    });
+  };
+
+  const handleSelectItem = (indexItem: number) => {
+    setSelectedItems((prev) => {
+      let newState: boolean[][] = [...prev];
+      newState[serviceIndex][indexItem] = !newState[serviceIndex][indexItem];
       return newState;
     });
   };
@@ -145,7 +164,20 @@ export default function Home() {
     };
 
     selectedServices.forEach((flag, index) => {
-      if (flag) order.services.push({ ...servicesState[index] });
+      if (flag) {
+        let service: Service = {
+          name: services[index].name,
+          items: [],
+        };
+
+        for (let i = 0; i < selectedItems[index].length; i++) {
+          if (selectedItems[index][i]) {
+            service.items.push(servicesState[index].items[i]);
+          }
+        }
+
+        order.services.push(service);
+      }
     });
 
     fetch("/api/order", {
@@ -236,39 +268,17 @@ export default function Home() {
           {services.map((service, index) => {
             return (
               <Box display={"flex"} alignItems={"center"} key={index}>
-                <ListItem
-                  border={"1px"}
-                  borderColor={
-                    !selectedServices[index] ? "whiteAlpha.200" : "purple.100"
-                  }
-                  bgColor={
-                    !selectedServices[index]
-                      ? "whiteAlpha.200"
-                      : "whiteAlpha.300"
-                  }
+                <CheckButton
+                  checked={selectedServices[index]}
                   display={"flex"}
-                  padding={"10px"}
-                  borderRadius={"lg"}
-                  height={"10"}
                   justifyContent={"center"}
                   alignItems={"center"}
                   flexGrow={1}
-                  _hover={{
-                    bgColor: "whiteAlpha.100",
-                    cursor: "pointer",
-                  }}
                   onClick={() => handleSelectService(index)}
                 >
-                  <Box
-                    display={"flex"}
-                    justifyContent={"space-evenly"}
-                    alignContent={"center"}
-                  >
-                    <Text fontSize={"medium"}>{service.name}</Text>
-                  </Box>
-                </ListItem>
+                  <Text fontSize={"medium"}>{service.name}</Text>
+                </CheckButton>
                 <IconButton
-                  key={index + 100}
                   ml={2}
                   colorScheme="purple"
                   aria-label="Visualize os itens do serviço"
@@ -276,17 +286,6 @@ export default function Home() {
                   onClick={() => {
                     setServiceIndex(index);
                     onOpenView();
-                  }}
-                />
-                <IconButton
-                  ml={2}
-                  key={index + 200}
-                  colorScheme="purple"
-                  aria-label="Visualize os itens do serviço"
-                  icon={<EditIcon />}
-                  onClick={() => {
-                    setServiceIndex(index);
-                    onOpenEdit();
                   }}
                 />
               </Box>
@@ -323,60 +322,22 @@ export default function Home() {
           <ModalHeader>{services[serviceIndex].name}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <UnorderedList spacing={2}>
-              {services[serviceIndex].items.map((item, index) => {
-                return <ListItem key={index}>{item}</ListItem>;
-              })}
-            </UnorderedList>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-
-      <Modal isCentered isOpen={isOpenEdit} onClose={onCloseEdit}>
-        <ModalOverlay backdropFilter="auto" backdropBlur="10px" />
-        <ModalContent bg={"#101010"}>
-          <ModalHeader>{services[serviceIndex].name}</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <UnorderedList spacing={2}>
+            <List spacing={2}>
               {services[serviceIndex].items.map((item, index) => {
                 return (
-                  <Box
-                    display={"flex"}
-                    alignItems={"center"}
-                    alignContent={"center"}
+                  <CheckButton
+                    checked={selectedItems[serviceIndex][index]}
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
                     key={index}
+                    onClick={() => handleSelectItem(index)}
                   >
-                    <ListItem flexGrow={1}>
-                      <Editable
-                        value={item}
-                        padding={"1"}
-                        bg={"whiteAlpha.200"}
-                        borderRadius={"md"}
-                        onChange={(value) => handleEditItem(index, value)}
-                      >
-                        <EditablePreview />
-                        <EditableInput />
-                      </Editable>
-                    </ListItem>
-                    <IconButton
-                      ml={2}
-                      colorScheme="red"
-                      aria-label="Delete o item do serviço"
-                      icon={<DeleteIcon />}
-                      onClick={(e) => handleDeleteItem(index)}
-                    />
-                  </Box>
+                    {item}
+                  </CheckButton>
                 );
               })}
-            </UnorderedList>
-            <IconButton
-              m={5}
-              colorScheme="green"
-              aria-label="Adicione item ao serviço"
-              icon={<AddIcon />}
-              onClick={handleAddItem}
-            />
+            </List>
           </ModalBody>
         </ModalContent>
       </Modal>
