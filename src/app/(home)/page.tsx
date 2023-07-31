@@ -11,6 +11,8 @@ import {
   Editable,
   EditableInput,
   EditablePreview,
+  FormControl,
+  FormLabel,
   Heading,
   IconButton,
   Input,
@@ -31,9 +33,11 @@ import {
   Switch,
   Text,
   Textarea,
+  Toast,
   UnorderedList,
   useBoolean,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import confetti from "canvas-confetti";
 import { useRouter } from "next/navigation";
@@ -41,6 +45,7 @@ import { ChangeEvent, useState } from "react";
 
 export default function Home() {
   const router = useRouter();
+  const toast = useToast();
   const [loading, setLoading] = useBoolean(false);
 
   const [nameError, setNameError] = useBoolean(false);
@@ -55,6 +60,7 @@ export default function Home() {
     new Date().toISOString().substring(0, 10)
   );
   const [comment, setComment] = useState("");
+  const [addItem, setAddItem] = useState("");
 
   const [selectedServices, setSelectedServices] = useState<boolean[]>([]);
   const [servicesState, setServices] = useState<Service[]>(services);
@@ -90,6 +96,34 @@ export default function Home() {
     setComment(e.target.value);
   };
 
+  const handleAddItemInput = (e: ChangeEvent<HTMLInputElement>) => {
+    setAddItem(e.target.value);
+  };
+
+  const handleAddItem = () => {
+    setServices((prev) => {
+      let newState = [...prev];
+      let pos = newState[serviceIndex].items.length;
+      newState[serviceIndex].items.push(addItem);
+      setSelectedItems((prev2) => {
+        let newState: boolean[][] = [...prev2];
+        newState[serviceIndex][pos] = !newState[serviceIndex][pos];
+        return newState;
+      });
+      return newState;
+    });
+    const item = addItem;
+    toast({
+      title: "Item adicionado com sucesso.",
+      description: `Item: ${item}`,
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    });
+    onCloseAdd();
+    setAddItem("");
+  };
+
   const handleSelectService = (index: number) => {
     if (!selectedServices[index]) {
       setServiceIndex(index);
@@ -114,14 +148,6 @@ export default function Home() {
     setServices((prev) => {
       let newState = [...prev];
       newState[serviceIndex].items[indexItem] = value;
-      return newState;
-    });
-  };
-
-  const handleAddItem = () => {
-    setServices((prev) => {
-      let newState = [...prev];
-      newState[serviceIndex].items.push("item");
       return newState;
     });
   };
@@ -201,9 +227,9 @@ export default function Home() {
   } = useDisclosure();
 
   const {
-    isOpen: isOpenEdit,
-    onOpen: onOpenEdit,
-    onClose: onCloseEdit,
+    isOpen: isOpenAdd,
+    onOpen: onOpenAdd,
+    onClose: onCloseAdd,
   } = useDisclosure();
 
   return (
@@ -319,7 +345,16 @@ export default function Home() {
       <Modal isCentered isOpen={isOpenView} onClose={onCloseView}>
         <ModalOverlay backdropFilter="auto" backdropBlur="10px" />
         <ModalContent bg={"#101010"}>
-          <ModalHeader>{services[serviceIndex].name}</ModalHeader>
+          <ModalHeader>
+            {services[serviceIndex].name}
+            <IconButton
+              m={5}
+              colorScheme="green"
+              aria-label="Adicione item ao serviço"
+              icon={<AddIcon />}
+              onClick={onOpenAdd}
+            />
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <List spacing={2}>
@@ -339,6 +374,30 @@ export default function Home() {
               })}
             </List>
           </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      <Modal isCentered isOpen={isOpenAdd} onClose={onCloseAdd}>
+        <ModalOverlay backdropFilter="auto" backdropBlur="10px" />
+        <ModalContent bg={"#101010"}>
+          <ModalHeader>{services[serviceIndex].name}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl>
+              <FormLabel>Adicione um item que não está na lista</FormLabel>
+              <Input
+                value={addItem}
+                onChange={handleAddItemInput}
+                placeholder="Item"
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={handleAddItem} colorScheme="purple" mr={3}>
+              Adicionar
+            </Button>
+            <Button onClick={onCloseAdd}>Cancelar</Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </Container>
