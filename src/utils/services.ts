@@ -1,6 +1,15 @@
+import coffeeBreakImage from "@/assets/images/coffeebreak.jpg";
+import churrascoImage from "@/assets/images/churrasco.jpg";
+import bebidasImage from "@/assets/images/bebidas.jpg";
+import rodaDeButecoImage from "@/assets/images/rodadebuteco.jpg";
+import jantarImage from "@/assets/images/jantar.jpg";
+import espacoParaEventoImage from "@/assets/images/espacoparaevento.jpg";
+import almocoImage from "@/assets/images/almoco.jpg";
+
 export const services = [
   {
     name: "Roda de Buteco",
+    image: rodaDeButecoImage,
     items: [
       "Filé de peito de frango empanado",
       "Batata frita",
@@ -27,6 +36,7 @@ export const services = [
   },
   {
     name: "Jantar",
+    image: jantarImage,
     items: [
       "Arroz",
       "Feijão tropeiro",
@@ -48,6 +58,7 @@ export const services = [
   },
   {
     name: "Almoço",
+    image: almocoImage,
     items: [
       "Arroz",
       "Feijão tropeiro",
@@ -69,6 +80,7 @@ export const services = [
   },
   {
     name: "Churrasco",
+    image: churrascoImage,
     items: [
       "Carne de boi (Chorizo, Contrafilé, Alcatra ou Picanha)",
       "Carne de porco",
@@ -81,7 +93,8 @@ export const services = [
     ],
   },
   {
-    name: "Coffe Break",
+    name: "Coffee Break",
+    image: coffeeBreakImage,
     items: [
       "Cafés (c/ açúcar e sem açúcar)",
       "Leite",
@@ -102,6 +115,7 @@ export const services = [
   },
   {
     name: "Bebidas",
+    image: bebidasImage,
     items: [
       "Suco natural 2 sabores",
       "Coca-cola",
@@ -113,7 +127,8 @@ export const services = [
     ],
   },
   {
-    name: "Espaço para Evento",
+    name: "Espaço",
+    image: espacoParaEventoImage,
     items: [
       "Espaço para até 120 pessoas. Localizado em Domingos Martins, rua Alida Lampier Schwambach nº 50 (casa de Darlene).",
     ],

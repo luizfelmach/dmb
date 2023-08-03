@@ -1,13 +1,12 @@
+import { ThemeProvider } from "@/components/theme-provider";
+import "../styles/globals.css";
 import type { Metadata } from "next";
-import localFont from "next/font/local";
-import { Providers } from "./providers";
-
-const inter = localFont({ src: "../assets/fonts/inter/Inter-Regular.ttf" });
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Darlene Machado Buffet",
   description:
-    "Casamentos, Aniversários, Eventos Corporativos, Coffe Break, Buffet Infantil, Churrasco & Aluguel de utensílios",
+    "Casamentos, Aniversários, Eventos Corporativos, Coffee Break, Buffet Infantil, Churrasco & Aluguel de utensílios 😋.",
 };
 
 export default function RootLayout({
@@ -17,8 +16,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-br">
-      <body className={inter.className}>
-        <Providers>{children}</Providers>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );

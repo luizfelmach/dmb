@@ -1,175 +1,111 @@
 "use client";
-import { CheckButton } from "@/components/CheckButton";
-import { Header } from "@/components/Header";
-import { Order, Service } from "@/types/order";
-import { services } from "@/utils/services";
-import { AddIcon, DeleteIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
+
+import { HeaderCompany } from "@/components/company-header";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { Button } from "@/components/ui/button";
 import {
-  Box,
-  Button,
-  Container,
-  Editable,
-  EditableInput,
-  EditablePreview,
+  Form,
   FormControl,
-  FormLabel,
-  Heading,
-  IconButton,
-  Input,
-  List,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Switch,
-  Text,
-  Textarea,
-  Toast,
-  UnorderedList,
-  useBoolean,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { BadgeCheck, BadgePlus, CalendarIcon, Plus } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Section } from "@/components/section";
+import { Textarea } from "@/components/ui/textarea";
+
+import logo from "@/assets/images/dmb.jpg";
+import { services } from "@/utils/services";
+import { ServiceToggle } from "@/components/service-toggle";
 import confetti from "canvas-confetti";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+import { useState } from "react";
+import { Toggle } from "@/components/ui/toggle";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Order, Service } from "@/utils/order.type";
+import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useState } from "react";
 
-export default function Home() {
-  const router = useRouter();
-  const toast = useToast();
-  const [loading, setLoading] = useBoolean(false);
+const company = {
+  companyName: "Darlene Machado Buffet",
+  companyImage: logo,
+  companyDescription:
+    "Casamentos, Aniversários, Eventos Corporativos, Coffee Break, Buffet Infantil, Churrasco & Aluguel de utensílios 😋. Faça seu orçamento 👇🏻",
+};
 
-  const [nameError, setNameError] = useBoolean(false);
-  const [addressError, setAddressError] = useBoolean(false);
-  const [peoplesError, setPeoplesError] = useBoolean(false);
-  const [eventDateError, setEventDateError] = useBoolean(false);
+const formSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Nome curto.")
+    .max(40, "Por favor, limite o nome a 40 caracteres."),
+  address: z
+    .string()
+    .min(2, "Endereço curto.")
+    .max(40, "Por favor, limite o endereço a 40 caracteres."),
+  peoples: z.number().min(20, "Mínimo de 20 pessoas necessário."),
+  eventDate: z.date({ required_error: "Selecione uma data." }),
+  comment: z.string(),
+});
 
-  const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
-  const [peoples, setPeoples] = useState(0);
-  const [eventDate, setEventDate] = useState(
-    new Date().toISOString().substring(0, 10)
-  );
-  const [comment, setComment] = useState("");
-  const [addItem, setAddItem] = useState("");
-
+export default function Company() {
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [selectedServices, setSelectedServices] = useState<boolean[]>([]);
-  const [servicesState, setServices] = useState<Service[]>(services);
-  const [serviceIndex, setServiceIndex] = useState(0);
+  const [modalView, setModalView] = useState<boolean>(false);
+  const [addItem, setAddItem] = useState<string>("");
+  const { toast } = useToast();
+  const router = useRouter();
 
   let initialItemState = Array(services.length);
   for (var i = 0; i < initialItemState.length; i++)
     initialItemState[i] = Array(0);
 
-  const [selectedItems, setSelectedItems] = useState(initialItemState);
+  const [selectedItems, setSelectedItems] =
+    useState<boolean[][]>(initialItemState);
+  const [servicesState, setServices] = useState<Service[]>(services);
 
-  const handleName = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value !== "") setNameError.off();
-    setName(e.target.value);
-  };
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      address: "",
+      peoples: 0,
+      comment: "",
+    },
+  });
 
-  const handleAddress = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value !== "") setAddressError.off();
-    setAddress(e.target.value);
-  };
-
-  const handlePeoples = (value: String) => {
-    if (+value !== 0) setPeoplesError.off();
-
-    setPeoples(+value);
-  };
-
-  const handleEventDate = (e: ChangeEvent<HTMLInputElement>) => {
-    setEventDate(e.target.value);
-  };
-
-  const handleComment = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setComment(e.target.value);
-  };
-
-  const handleAddItemInput = (e: ChangeEvent<HTMLInputElement>) => {
-    setAddItem(e.target.value);
-  };
-
-  const handleAddItem = () => {
-    setServices((prev) => {
-      let newState = [...prev];
-      let pos = newState[serviceIndex].items.length;
-      newState[serviceIndex].items.push(addItem);
-      setSelectedItems((prev2) => {
-        let newState: boolean[][] = [...prev2];
-        newState[serviceIndex][pos] = !newState[serviceIndex][pos];
-        return newState;
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    if (selectedServices.filter((a) => a).length === 0) {
+      toast({
+        title: "Nenhum serviço foi selecionado",
+        description: "Selecione pelo menos um serviço.",
+        variant: "destructive",
+        duration: 3000,
       });
-      return newState;
-    });
-    const item = addItem;
-    toast({
-      title: "Item adicionado com sucesso.",
-      description: `Item: ${item}`,
-      status: "success",
-      duration: 9000,
-      isClosable: true,
-    });
-    onCloseAdd();
-    setAddItem("");
-  };
-
-  const handleSelectService = (index: number) => {
-    if (!selectedServices[index]) {
-      setServiceIndex(index);
-      onOpenView();
-    }
-    setSelectedServices((prev) => {
-      let newState: boolean[] = [...prev];
-      newState[index] = !newState[index];
-      return newState;
-    });
-  };
-
-  const handleSelectItem = (indexItem: number) => {
-    setSelectedItems((prev) => {
-      let newState: boolean[][] = [...prev];
-      newState[serviceIndex][indexItem] = !newState[serviceIndex][indexItem];
-      return newState;
-    });
-  };
-
-  const handleEditItem = (indexItem: number, value: string) => {
-    setServices((prev) => {
-      let newState = [...prev];
-      newState[serviceIndex].items[indexItem] = value;
-      return newState;
-    });
-  };
-
-  const handleDeleteItem = (indexItem: number) => {
-    setServices((prev) => {
-      let newState = [...prev];
-      newState[serviceIndex].items.splice(indexItem, 1);
-      return newState;
-    });
-  };
-
-  const handleSubmit = () => {
-    if (name === "") setNameError.on();
-    if (address === "") setAddressError.on();
-    if (peoples === 0) setPeoplesError.on();
-
-    if (name === "" || address === "" || peoples === 0) {
       return;
     }
-
-    setLoading.on();
     confetti({
       particleCount: 100,
       startVelocity: 30,
@@ -180,10 +116,12 @@ export default function Home() {
       },
     });
 
+    const { name, address, eventDate, peoples, comment } = form.getValues();
+
     const order: Order = {
       name,
       address,
-      eventDate,
+      eventDate: eventDate.toDateString(),
       peoples,
       services: [],
       comment,
@@ -215,191 +153,287 @@ export default function Home() {
         if (data != undefined) {
           router.push(`/${data.id}`);
         }
-        setLoading.off();
       })
       .catch((error) => console.log(error));
   };
 
-  const {
-    isOpen: isOpenView,
-    onOpen: onOpenView,
-    onClose: onCloseView,
-  } = useDisclosure();
-
-  const {
-    isOpen: isOpenAdd,
-    onOpen: onOpenAdd,
-    onClose: onCloseAdd,
-  } = useDisclosure();
-
   return (
-    <Container>
-      <Header />
+    <div>
+      <HeaderCompany {...company} />
 
-      <Box my={10}>
-        <Heading my={3}>Informações Gerais</Heading>
-        <Text fontSize="sm" mt={3}>
-          Nome
-        </Text>
-        <Input
-          onChange={handleName}
-          value={name}
-          isInvalid={nameError}
-          size={"lg"}
-          focusBorderColor="purple.100"
-        />
-        <Text fontSize="sm" mt={3}>
-          Endereço do evento
-        </Text>
-        <Input
-          onChange={handleAddress}
-          value={address}
-          size={"lg"}
-          isInvalid={addressError}
-          focusBorderColor="purple.100"
-        />
-        <Text fontSize="sm" mt={3}>
-          Quantidade de pessoas
-        </Text>
-        <NumberInput
-          onChange={handlePeoples}
-          value={peoples === 0 ? "" : peoples}
-          min={0}
-          size={"lg"}
-          isInvalid={peoplesError}
-          focusBorderColor="purple.100"
-        >
-          <NumberInputField />
-          <NumberInputStepper>
-            <NumberIncrementStepper />
-            <NumberDecrementStepper />
-          </NumberInputStepper>
-        </NumberInput>
-        <Text fontSize="sm" mt={3}>
-          Dia do evento
-        </Text>
-        <Input
-          onChange={handleEventDate}
-          value={eventDate}
-          type="date"
-          size={"lg"}
-          isInvalid={eventDateError}
-          focusBorderColor="purple.100"
-        />
-      </Box>
+      <div className="flex justify-center">
+        <div className="w-11/12 max-w-2xl mt-9">
+          <form
+            className="space-y-10 mb-16"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <Section
+              title="Informações gerais"
+              description="Forneça detalhes de você e do evento."
+            >
+              <Form {...form}>
+                <div className="space-y-3">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            placeholder="Nome"
+                            className="text-base"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-      <Box my={10}>
-        <Heading my={3}>Serviços</Heading>
-        <List spacing={4}>
-          {services.map((service, index) => {
-            return (
-              <Box display={"flex"} alignItems={"center"} key={index}>
-                <CheckButton
-                  checked={selectedServices[index]}
-                  display={"flex"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                  flexGrow={1}
-                  onClick={() => handleSelectService(index)}
-                >
-                  <Text fontSize={"medium"}>{service.name}</Text>
-                </CheckButton>
-                <IconButton
-                  ml={2}
-                  colorScheme="purple"
-                  aria-label="Visualize os itens do serviço"
-                  icon={<ViewIcon />}
-                  onClick={() => {
-                    setServiceIndex(index);
-                    onOpenView();
-                  }}
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            placeholder="Endereço do evento"
+                            className="text-base"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="peoples"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            className="text-base"
+                            placeholder="Quantidade de pessoas"
+                            type="number"
+                            {...field}
+                            value={field.value === 0 ? "" : field.value}
+                            onChange={(event) =>
+                              field.onChange(+event.target.value)
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="eventDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "pl-3 text-left font-normal text-base",
+                                  !field.value && " text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP", { locale: ptBR })
+                                ) : (
+                                  <span className="text-base">
+                                    Data do evento
+                                  </span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              locale={ptBR}
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) => date <= new Date()}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </Form>
+            </Section>
+
+            <Section
+              title="Serviços"
+              description="Selecione os serviços que deseja orçar."
+            >
+              <div className="desktop:flex desktop:flex-wrap desktop:justify-center">
+                {services.map((service, index) => {
+                  return (
+                    <ServiceToggle
+                      key={index}
+                      title={service.name}
+                      image={service.image}
+                      enable={selectedServices[index]}
+                      onClick={() => {
+                        setSelectedIndex(index);
+                        setModalView(true);
+                      }}
+                      total={selectedItems[index].filter((a) => a).length}
+                      onCheckedChange={() => {
+                        setSelectedServices((prev) => {
+                          let newState = [...prev];
+                          if (!newState[index]) {
+                            setSelectedIndex(index);
+                            setModalView(true);
+                          } else {
+                            setSelectedItems((prev) => {
+                              let newState = [...prev];
+                              newState[index].fill(false);
+                              return newState;
+                            });
+                          }
+                          newState[index] = !newState[index];
+                          return newState;
+                        });
+                      }}
+                    ></ServiceToggle>
+                  );
+                })}
+              </div>
+            </Section>
+
+            <Section
+              title="Observações"
+              description="Deixe algumas observações, se necessário."
+            >
+              <Form {...form}>
+                <FormField
+                  control={form.control}
+                  name="comment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Escreve suas observações"
+                          className="resize-none text-base"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </Box>
-            );
-          })}
-        </List>
-      </Box>
+              </Form>
+            </Section>
 
-      <Box my={10}>
-        <Heading my={3}>Observações</Heading>
-        <Text fontSize="sm">Deixe algumas observações</Text>
-        <Textarea
-          value={comment}
-          onChange={handleComment}
-          focusBorderColor="purple.100"
-        />
-      </Box>
+            <Button className="w-full" variant={"default"} type="submit">
+              <span className="font-bold text-base">Finalizar</span>
+            </Button>
+          </form>
+        </div>
+      </div>
 
-      <Box my={10} display={"flex"} justifyContent={"center"}>
-        <Button
-          isLoading={loading}
-          colorScheme="purple"
-          size="lg"
-          onClick={handleSubmit}
-          width={"xs"}
-        >
-          Finalizar
-        </Button>
-      </Box>
-
-      <Modal isCentered isOpen={isOpenView} onClose={onCloseView}>
-        <ModalOverlay backdropFilter="auto" backdropBlur="10px" />
-        <ModalContent bg={"#101010"}>
-          <ModalHeader>
-            {services[serviceIndex].name}
-            <IconButton
-              m={5}
-              colorScheme="green"
-              aria-label="Adicione item ao serviço"
-              icon={<AddIcon />}
-              onClick={onOpenAdd}
-            />
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <List spacing={2}>
-              {services[serviceIndex].items.map((item, index) => {
+      <Dialog
+        open={modalView}
+        onOpenChange={() => {
+          if (selectedItems[selectedIndex].filter((a) => a).length == 0) {
+            toast({
+              title: "Nenhum item foi selecionado",
+              description: "Selecione pelo menos um item.",
+              variant: "destructive",
+              duration: 3000,
+            });
+            setSelectedServices((prev) => {
+              let newState = [...prev];
+              newState[selectedIndex] = false;
+              return newState;
+            });
+          }
+          setModalView(!modalView);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{services[selectedIndex].name}</DialogTitle>
+            <DialogDescription>
+              Selecione os itens que deseja no seu evento.
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-56">
+            <div className="flex flex-wrap justify-center">
+              {services[selectedIndex].items.map((item, index) => {
                 return (
-                  <CheckButton
-                    checked={selectedItems[serviceIndex][index]}
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
+                  <Toggle
                     key={index}
-                    onClick={() => handleSelectItem(index)}
+                    className="m-1 texy-sm flex min-h-[35px] h-min"
+                    variant="outline"
+                    pressed={selectedItems[selectedIndex][index]}
+                    onPressedChange={() => {
+                      setSelectedItems((prev) => {
+                        let newState = [...prev];
+                        newState[selectedIndex][index] =
+                          !newState[selectedIndex][index];
+                        return newState;
+                      });
+                    }}
                   >
-                    {item}
-                  </CheckButton>
+                    {selectedItems[selectedIndex][index] ? (
+                      <BadgeCheck className="flex-shrink-0 mr-1 text-primary " />
+                    ) : (
+                      <></>
+                    )}
+                    <span className="">{item}</span>
+                  </Toggle>
                 );
               })}
-            </List>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-
-      <Modal isCentered isOpen={isOpenAdd} onClose={onCloseAdd}>
-        <ModalOverlay backdropFilter="auto" backdropBlur="10px" />
-        <ModalContent bg={"#101010"}>
-          <ModalHeader>{services[serviceIndex].name}</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <FormControl>
-              <FormLabel>Adicione um item que não está na lista</FormLabel>
+            </div>
+          </ScrollArea>
+          <DialogFooter>
+            <div className="flex justify-center space-x-4">
               <Input
+                className="text-base"
                 value={addItem}
-                onChange={handleAddItemInput}
-                placeholder="Item"
+                type="text"
+                onChange={(e) => {
+                  setAddItem(e.target.value);
+                }}
+                placeholder="Adicione um item"
               />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={handleAddItem} colorScheme="purple" mr={3}>
-              Adicionar
-            </Button>
-            <Button onClick={onCloseAdd}>Cancelar</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </Container>
+              <Button
+                size={"icon"}
+                onClick={() => {
+                  setServices((prev) => {
+                    let newState = [...prev];
+                    let last = newState[selectedIndex].items.length;
+                    newState[selectedIndex].items.push(addItem);
+                    setSelectedItems((prevItems) => {
+                      let newState = [...prevItems];
+                      newState[selectedIndex][last] = true;
+                      return newState;
+                    });
+                    setAddItem("");
+                    return newState;
+                  });
+                }}
+              >
+                <Plus />
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { array, number, object, string } from "yup";
-import { prisma } from "@/db/prisma";
 import { createId } from "@paralleldrive/cuid2";
+import { prisma } from "@/lib/prisma";
 
 let orderSchema = object({
   name: string().required(),
