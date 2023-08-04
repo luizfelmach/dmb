@@ -23,11 +23,11 @@ function Loading() {
       </div>
       <div>
         <Skeleton className="h-12 w-52" />
-        <div className="space-y-2 mt-4">
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
+        <div className="space-y-2 mt-6">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
         </div>
       </div>
       <div className="h-10"></div>
