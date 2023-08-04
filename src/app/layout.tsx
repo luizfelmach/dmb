@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 export const metadata: Metadata = {
   title: "Darlene Machado Buffet",
   description:
-    "Casamentos, Aniversários, Eventos Corporativos, Coffee Break, Buffet Infantil, Churrasco & Aluguel de utensílios 😋.",
+    "Casamentos, Aniversários, Eventos Corporativos, Coffee Break, Buffet Infantil, Churrasco, Espaço para Eventos & Aluguel de utensílios 😋.",
 };
 
 export default function RootLayout({

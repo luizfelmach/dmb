@@ -14,7 +14,7 @@ export function HeaderCompany({
   companyDescription,
 }: HeaderCompanyProps) {
   return (
-    <div className="h-80 bg-accent relative overflow-hidden">
+    <div className="h-[335px] bg-accent relative overflow-hidden">
       <div className="flex justify-between p-3">
         <ToggleTheme />
         <DropdownMedia />
@@ -29,9 +29,11 @@ export function HeaderCompany({
           src={companyImage}
         />
         <p className="text-center m-4 font-bold text-xl">{companyName}</p>
-        <p className="text-center text-sm text-foreground/50 mx-4">
-          {companyDescription}
-        </p>
+        <div className="flex justify-center">
+          <p className="max-w-xl text-center text-sm text-foreground/50 mx-4">
+            {companyDescription}
+          </p>
+        </div>
       </div>
     </div>
   );
