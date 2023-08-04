@@ -155,6 +155,7 @@ export default function Company() {
       .then((data) => {
         if (data != undefined) {
           router.push(`/${data.id}`);
+          setLoading(false);
         }
       })
       .catch((error) => console.log(error));
