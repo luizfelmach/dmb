@@ -20,7 +20,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { BadgeCheck, BadgePlus, CalendarIcon, Plus } from "lucide-react";
+import {
+  BadgeCheck,
+  BadgePlus,
+  CalendarIcon,
+  Loader,
+  Plus,
+} from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -68,6 +74,7 @@ export default function Company() {
   const [selectedServices, setSelectedServices] = useState<boolean[]>([]);
   const [modalView, setModalView] = useState<boolean>(false);
   const [addItem, setAddItem] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -99,6 +106,9 @@ export default function Company() {
       });
       return;
     }
+
+    setLoading(true);
+
     confetti({
       particleCount: 100,
       startVelocity: 30,
@@ -331,8 +341,21 @@ export default function Company() {
               </Form>
             </Section>
 
-            <Button className="w-full" variant={"default"} type="submit">
-              <span className="font-bold text-base">Finalizar</span>
+            <Button
+              disabled={loading}
+              className="w-full"
+              variant={"default"}
+              type="submit"
+            >
+              {loading ? (
+                <>
+                  <Loader className="animate-spin" />
+                </>
+              ) : (
+                <>
+                  <span className="font-bold text-base">Finalizar</span>
+                </>
+              )}
             </Button>
           </form>
         </div>
