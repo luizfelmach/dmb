@@ -10,9 +10,29 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { DollarSign, Dot } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function Loading() {
-  return "Carregando";
+  return (
+    <div className="space-y-9">
+      <div className="flex justify-end">
+        <div>
+          <Skeleton className="mr-4 h-12 w-24" />
+        </div>
+        <Skeleton className="h-12 w-12" />
+      </div>
+      <div>
+        <Skeleton className="h-12 w-52" />
+        <div className="space-y-2 mt-4">
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+        </div>
+      </div>
+      <div className="h-10"></div>
+    </div>
+  );
 }
 
 export default function OrderView({ params }: { params: { id: string } }) {
