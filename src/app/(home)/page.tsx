@@ -28,7 +28,6 @@ import { ptBR } from "date-fns/locale";
 import { Section } from "@/components/section";
 import { Textarea } from "@/components/ui/textarea";
 
-import logo from "@/assets/images/dmb.jpg";
 import { services } from "@/utils/services";
 import { ServiceToggle } from "@/components/service-toggle";
 import confetti from "canvas-confetti";
@@ -48,13 +47,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Order, Service } from "@/utils/order.type";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-
-const company = {
-  companyName: "Darlene Machado Buffet",
-  companyImage: logo,
-  companyDescription:
-    "Casamentos, Aniversários, Eventos Corporativos, Coffee Break, Buffet Infantil, Churrasco & Aluguel de utensílios 😋. Faça seu orçamento 👇🏻",
-};
+import { company } from "@/utils/company";
 
 const formSchema = z.object({
   name: z
