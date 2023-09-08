@@ -47,11 +47,13 @@ export default function Home() {
                         setLoading(false)
                     })
                     .catch((err) => {
+                        alert(err)
                         console.log(err);
                         setLoading(false)
                     });
             })
             .catch((error) => {
+                alert(error)
                 console.log(error)
                 setLoading(false)
             });

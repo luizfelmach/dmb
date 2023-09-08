@@ -3,6 +3,7 @@ export function createPrompt(budget: string): string {
     O seu trabalho é pegar um texto tanscrito de uma pessoa falando e eu preciso que você interprete esse texto e gere um JSON em formato string.
     
     ME RETORNE APENAS O JSON EM FORMATO STRING.
+    ENVIE O JSON COMPLETO SEM ERROS.!!!!
     
     Eu preciso que você gere um JSON para mim com o seguinte schema. O schema especifica o que tem e o que é opcional. Ele está no formato de typescript.
 

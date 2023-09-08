@@ -134,7 +134,7 @@ export const PdfDocument = ({ budge }: any) => {
                                 {service.items.map((item: any, index2: number) => {
                                     return (
                                         <Text key={index2}>
-                                            {index != 0 ? " \u2022 " : ""}
+                                            {index2 != 0 ? " \u2022 " : ""}
                                             {item}
                                         </Text>
                                     );
