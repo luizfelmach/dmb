@@ -59,7 +59,6 @@ export default function Home() {
 
     return (
         <div className="flex justify-center">
-
             <div className="w-11/12 max-w-2xl mt-9">
 
                 <h1 className="font-bold text-3xl mb-8">Gere orçamentos</h1>

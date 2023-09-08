@@ -2,6 +2,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import "../styles/globals.css";
 import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/toaster";
+import Head from "next/head";
 
 export const metadata: Metadata = {
   title: "Darlene Machado Buffet",
@@ -16,6 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-br">
+      <head>
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+      </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
